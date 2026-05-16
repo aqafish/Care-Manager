@@ -194,20 +194,35 @@ function closeModal() {
     document.body.style.overflow = "auto";
 }
 
-// Search & Filter Logic
+// Search & Filter Logic - Robust matching
 function handleSearch(query = null) {
-    const q = query !== null ? query.replace('#', '').toLowerCase() : searchInput.value.toLowerCase();
-    const filtered = knowledgeData.filter(item => 
-        item.title.toLowerCase().includes(q) || 
-        item.description.toLowerCase().includes(q) ||
-        item.category.toLowerCase().includes(q) ||
-        item.tag.toLowerCase().includes(q)
-    );
+    // If query is provided, use it. Otherwise, use the search input value.
+    // In both cases, strip '#' and spaces to ensure better matching.
+    let rawQ = query !== null ? query : (searchInput ? searchInput.value : "");
+    const q = rawQ.replace(/#/g, '').trim().toLowerCase();
+    
+    const filtered = knowledgeData.filter(item => {
+        const textToSearch = (item.title + item.description + item.category + item.tag).toLowerCase();
+        return textToSearch.includes(q);
+    });
+    
     renderNews(filtered);
     
+    // Smooth scroll to news area if filtering
     if (q !== "") {
         const target = document.getElementById('news');
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
+        if (target) {
+            const offset = 80; // Account for sticky header
+            const bodyRect = document.body.getBoundingClientRect().top;
+            const elementRect = target.getBoundingClientRect().top;
+            const elementPosition = elementRect - bodyRect;
+            const offsetPosition = elementPosition - offset;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
     }
 }
 
@@ -225,22 +240,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const navNews = document.getElementById('navNews');
     const navSkills = document.getElementById('navSkills');
     const refreshNewsBtn = document.getElementById('refreshNews');
-    const categoryTags = document.querySelectorAll('.category-tag');
 
     // Initial renders
     renderNews(knowledgeData);
     fetchLatestNotifications();
 
-    // Category Tags Logic
-    categoryTags.forEach(tag => {
-        tag.addEventListener('click', () => {
-            const tagName = tag.textContent;
+    // Event Delegation for Sidebar Tags (More robust)
+    document.addEventListener('click', (e) => {
+        if (e.target.classList.contains('category-tag')) {
+            const tagName = e.target.textContent;
             if (searchInput) searchInput.value = tagName;
             handleSearch(tagName);
-        });
+        }
     });
 
-    // Event Listeners
+    // Logo Click Reset
     if (logoLink) {
         logoLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -250,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Nav Links
     if (navNews) {
         navNews.addEventListener('click', (e) => {
             e.preventDefault();
@@ -265,12 +280,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Refresh News
     if (refreshNewsBtn) {
         refreshNewsBtn.addEventListener('click', () => {
             fetchLatestNotifications();
         });
     }
 
+    // Search Box
     if (searchButton) {
         searchButton.addEventListener('click', () => handleSearch());
     }
@@ -279,6 +296,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter') handleSearch();
         });
     }
+    
+    // Modal Close
     if (closeButton) {
         closeButton.addEventListener('click', closeModal);
     }
