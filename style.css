@@ -279,6 +279,34 @@ main {
     color: var(--sb-green);
 }
 
+/* Partner Tabs */
+.partner-tabs {
+    border-bottom: 1px solid var(--sb-light-green);
+    padding-bottom: 8px;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--sb-text-muted);
+    cursor: pointer;
+    border-radius: 15px;
+    transition: var(--transition);
+}
+
+.tab-btn:hover {
+    background: var(--sb-light-green);
+    color: var(--sb-green);
+}
+
+.tab-btn.active {
+    background: var(--sb-green);
+    color: white;
+}
+
 /* Footer */
 footer {
     background: var(--sb-green);
@@ -548,4 +576,20 @@ footer {
 header {
     background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(10px);
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--sb-light-green);
+    border-top: 4px solid var(--sb-green);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

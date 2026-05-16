@@ -55,7 +55,81 @@ const knowledgeData = [
 ];
 
 // Variables to be initialized on DOMContentLoaded
-let newsGrid, searchInput, searchButton, modal, modalBody, closeButton, notificationList;
+let newsGrid, searchInput, searchButton, modal, modalBody, closeButton, notificationList, partnerNewsList;
+
+const partnerNewsData = {
+    'cm-online': [
+        { title: "捜査資料に「デブ、ブタ」 茨城県警、被告の行動観察", url: "https://www.caremanagement.jp/news/detail/31437", date: "2026/05/15" },
+        { title: "妻と死別、認知症倍増 高齢男性", url: "https://www.caremanagement.jp/news/detail/31436", date: "2026/05/12" },
+        { title: "コロナで臨場、救急隊の扉破壊に賠償命令", url: "https://www.caremanagement.jp/news/detail/31435", date: "2026/05/10" }
+    ],
+    'cm-dot-com': [
+        { title: "多職種連携での「モラハラ」について：ハラスメント対策の新視点", url: "https://i.care-mane.com/times/133837", date: "2026/05/16" },
+        { title: "厚労省通知vol.1503：身寄りのない高齢者支援等の調査報告", url: "https://i.care-mane.com/times/133736", date: "2026/05/14" },
+        { title: "介護保険の利用者負担引き上げは見送りか？医療費増が優先と予測", url: "https://i.care-mane.com/times/133652", date: "2026/05/11" }
+    ]
+};
+
+// Keywords to filter Care Manager specific news
+const cmKeywords = ["ケアマネ", "介護支援専門員", "居宅介護支援", "ケアプラン", "介護報酬", "処遇改善", "資格更新", "法定研修"];
+
+// Function to fetch real-time news from WAM NET and merge with knowledgeData
+async function fetchRealTimeFeaturedTopics() {
+    if (!newsGrid) return;
+    
+    // Show loading state in the grid
+    newsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>ケアマネ専門情報を同期中...</p></div>';
+
+    try {
+        const wamRss = encodeURIComponent('https://www.wam.go.jp/newsPublic/news_new_rss');
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${wamRss}`);
+        const data = await response.json();
+        
+        if (data.status === 'ok' && data.items.length > 0) {
+            // Filter items by CM keywords
+            const filteredItems = data.items.filter(item => {
+                const text = (item.title + item.description).toLowerCase();
+                return cmKeywords.some(kw => text.includes(kw));
+            });
+
+            const realTimeItems = filteredItems.slice(0, 6).map((item, index) => {
+                const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
+                return {
+                    id: `rt-${index}`,
+                    title: item.title,
+                    date: date,
+                    category: "ケアマネ実務",
+                    description: item.description || "ケアマネジャー向けの最新ニュースです。",
+                    image: "assets/cm1.png", // Fallback image
+                    tag: "リアルタイム",
+                    fullText: `
+                        <div class="modal-header">
+                            <span class="card-tag">リアルタイム</span>
+                            <h1>${item.title}</h1>
+                            <p class="card-date">公開日: ${date}</p>
+                        </div>
+                        <div class="modal-body">
+                            <p>${item.description || ""}</p>
+                            <div style="margin-top: 30px; padding: 20px; background: var(--sb-light-green); border-radius: var(--radius-md); text-align: center;">
+                                <p>詳細な情報は公式サイトでご確認いただけます。</p>
+                                <a href="${item.link}" target="_blank" class="btn-outline" style="display: inline-block; background: var(--sb-green); color: white; margin-top: 10px;">外部サイトで全文を読む</a>
+                            </div>
+                        </div>
+                    `
+                };
+            });
+
+            // Combine static knowledge with real-time news
+            const combinedData = [...realTimeItems, ...knowledgeData];
+            renderNews(combinedData);
+        } else {
+            renderNews(knowledgeData);
+        }
+    } catch (error) {
+        console.error('Real-time Fetch Error:', error);
+        renderNews(knowledgeData);
+    }
+}
 
 // Function to render news cards
 function renderNews(data) {
@@ -89,7 +163,60 @@ function renderNews(data) {
     document.querySelectorAll('.read-more').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.getAttribute('data-id');
-            const article = knowledgeData.find(a => a.id == id);
+            // Check both real-time items and static knowledge
+            let article;
+            if (id.toString().startsWith('rt-')) {
+                // This is a bit inefficient but works for demonstration
+                // In a real app, we'd keep the combined list in a variable
+                const allItems = [...document.querySelectorAll('.read-more')].map(b => b.dataset.id);
+                // We'll just fetch it again or store it globally.
+                // For now, let's assume we can find it in the data passed to renderNews
+            }
+            
+            // Re-find the article from the data
+            // To make this work properly, we should store currentData globally
+            const articleToOpen = currentNewsData.find(a => a.id == id);
+            if (articleToOpen) {
+                openModal(articleToOpen.fullText);
+            }
+        });
+    });
+}
+
+let currentNewsData = []; // Global to store current news
+function renderNews(data) {
+    currentNewsData = data;
+    if (!newsGrid) return;
+    newsGrid.innerHTML = '';
+    
+    if (data.length === 0) {
+        newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 1.2rem; color: var(--sb-text-muted);">該当するナレッジが見つかりませんでした。</p>';
+        return;
+    }
+
+    data.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card animate-fade-in';
+        card.innerHTML = `
+            <div class="card-img" style="background-image: url('${item.image}')"></div>
+            <div class="card-body">
+                <span class="card-date">${item.date}</span>
+                <span class="card-tag">${item.tag}</span>
+                <h3>${item.title}</h3>
+                <p>${item.description}</p>
+                <div class="card-footer">
+                    <button class="btn-outline read-more" data-id="${item.id}">全文を読む</button>
+                </div>
+            </div>
+        `;
+        newsGrid.appendChild(card);
+    });
+
+    // Add event listeners to buttons
+    document.querySelectorAll('.read-more').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const article = currentNewsData.find(a => a.id == id);
             if (article) {
                 openModal(article.fullText);
             }
@@ -125,12 +252,24 @@ async function fetchLatestNotifications() {
                 notificationList.appendChild(li);
             });
 
-            data.items.slice(0, 3).forEach(item => {
-                const li = document.createElement('li');
-                const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
-                li.innerHTML = `<a href="${item.link}" target="_blank">【${date}】${item.title}</a>`;
-                notificationList.appendChild(li);
+            data.items.forEach(item => {
+                const text = (item.title + item.description).toLowerCase();
+                if (cmKeywords.some(kw => text.includes(kw))) {
+                    const li = document.createElement('li');
+                    const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
+                    li.innerHTML = `<a href="${item.link}" target="_blank">【${date}】${item.title}</a>`;
+                    notificationList.appendChild(li);
+                }
             });
+            
+            // If no filtered items, show a message or just default links
+            if (notificationList.children.length === defaultLinks.length) {
+                const li = document.createElement('li');
+                li.style.fontSize = "0.8rem";
+                li.style.color = "var(--sb-text-muted)";
+                li.textContent = "※現在、新しいケアマネ専門通知はありません。";
+                notificationList.appendChild(li);
+            }
         } else {
             throw new Error('No data');
         }
@@ -143,6 +282,28 @@ async function fetchLatestNotifications() {
             notificationList.appendChild(li);
         });
     }
+}
+
+// Function to render partner news
+function renderPartnerNews(sourceId) {
+    if (!partnerNewsList) return;
+    const items = partnerNewsData[sourceId] || [];
+    partnerNewsList.innerHTML = '';
+    
+    items.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="${item.url}" target="_blank">【${item.date}】${item.title}</a>`;
+        partnerNewsList.appendChild(li);
+    });
+}
+
+// Function to simulate fetching partner news
+async function fetchPartnerNews() {
+    if (!partnerNewsList) return;
+    
+    // In a real scenario, this would call a server-side scraper or a CORS-proxy
+    // Since direct scraping is blocked by CORS, we use our updated data store
+    renderPartnerNews('cm-online');
 }
 
 // Modal Functions
@@ -198,14 +359,26 @@ document.addEventListener('DOMContentLoaded', () => {
     modalBody = document.getElementById('modalBody');
     closeButton = document.querySelector('.close-button');
     notificationList = document.querySelector('.news-list');
+    partnerNewsList = document.getElementById('partnerNewsList');
+    const partnerTabs = document.querySelectorAll('.tab-btn');
     const logoLink = document.getElementById('logoLink');
     const navNews = document.getElementById('navNews');
     const navSkills = document.getElementById('navSkills');
     const refreshNewsBtn = document.getElementById('refreshNews');
 
     // Initial renders
-    renderNews(knowledgeData);
+    fetchRealTimeFeaturedTopics();
     fetchLatestNotifications();
+    fetchPartnerNews();
+
+    // Partner Tabs logic
+    partnerTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            partnerTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderPartnerNews(tab.dataset.target);
+        });
+    });
 
     // Event Delegation for Sidebar Tags
     document.addEventListener('click', (e) => {
@@ -221,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         logoLink.addEventListener('click', (e) => {
             e.preventDefault();
             if (searchInput) searchInput.value = "";
-            renderNews(knowledgeData);
+            fetchRealTimeFeaturedTopics();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
@@ -246,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (refreshNewsBtn) {
         refreshNewsBtn.addEventListener('click', () => {
             fetchLatestNotifications();
+            fetchRealTimeFeaturedTopics();
         });
     }
 
