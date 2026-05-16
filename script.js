@@ -42,38 +42,13 @@ const knowledgeData = [
             </div>
             <div class="modal-body">
                 <p>厚生労働省の検討会にて、長年議論されてきた「介護支援専門員（ケアマネジャー）の更新制」の廃止が正式に決定しました。これにより、一度取得した資格に有効期限がなくなります。</p>
-                <h2>変更の概要</h2>
+                <h2>変更 of the 概要</h2>
                 <ul>
                     <li><strong>更新研修の廃止:</strong> これまでの5年ごとの大規模な更新研修（法定研修）は廃止されます。</li>
                     <li><strong>定期研修の義務化:</strong> 更新制はなくなりますが、専門性の維持のため、より短時間で実務に直結した「定期研修」の受講が義務付けられます。</li>
                     <li><strong>資格の生涯有効化:</strong> 資格失効のリスクがなくなり、一度現場を離れた方の復職が容易になります。</li>
                 </ul>
                 <p>施行は2026年度中を予定しており、現時点で更新期限が近い方の取り扱いについては、各自治体から詳細な通知が出る見通しです。</p>
-            </div>
-        `
-    },
-    {
-        id: 3,
-        title: "ICT活用によるモニタリングの効率化ガイド",
-        date: "2026/04/28",
-        category: "業務効率化",
-        description: "テレビ電話等を活用したモニタリングの要件緩和をどう活かすか。現場での導入事例と注意点を紹介します。",
-        image: "assets/cm2.png",
-        tag: "スキルアップ",
-        fullText: `
-            <div class="modal-header">
-                <span class="card-tag">スキルアップ</span>
-                <h1>ICT活用によるモニタリングの効率化</h1>
-                <p class="card-date">公開日: 2026/04/28</p>
-            </div>
-            <div class="modal-body">
-                <p>2024年度の改定により、一定の条件下でテレビ電話等を活用したモニタリングが可能となりました。これにより、移動時間の削減と頻繁なコミュニケーションの両立が可能になります。</p>
-                <h2>活用事例</h2>
-                <ul>
-                    <li><strong>状態が安定している利用者様:</strong> 2回に1回をビデオ通話に切り替えることで、効率的な訪問計画を実現。</li>
-                    <li><strong>遠方の家族との連携:</strong> モニタリング時にビデオ通話で家族も同席し、三者間での情報共有を強化。</li>
-                </ul>
-                <p>ただし、情報セキュリティの確保や、利用者様本人の同意が必須条件となります。適切なツール選びと運用のポイントを解説します。</p>
             </div>
         `
     }
@@ -122,16 +97,16 @@ function renderNews(data) {
     });
 }
 
-// Function to fetch latest MHLW Notifications with PINPOINT stable links
+// Function to fetch latest MHLW Notifications with PINPOINT PDF stable links
 async function fetchLatestNotifications() {
     if (!notificationList) return;
     
-    // Updated stable and verified pinpoint URLs as of May 2026
+    // Most SOLID and PINPOINT official sources
     const defaultLinks = [
-        { title: "【最新:Vol.1502】介護報酬改定 Q&A・留意事項通知（厚生労働省）", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" },
-        { title: "【重要】ケアマネ資格更新制度の廃止スケジュール・検討会資料", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index.html" },
-        { title: "【通知】熱中症予防対策の義務化（令和7年度改定）特設ページ", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/anzen/anzeneisei06/index.html" },
-        { title: "【公式】介護分野における生産性向上ポータル（ガイドライン・ツール）", url: "https://介護生産性向上.mhlw.go.jp/" }
+        { title: "【最新】介護報酬改定 Q&A・留意事項 (Vol.1502)", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" },
+        { title: "【決定】ケアマネ資格更新制度の廃止：法案概要資料 (PDF)", url: "https://www.mhlw.go.jp/content/001685800.pdf" },
+        { title: "【通知】熱中症予防対策の義務化と発生時の手順 (特設)", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/anzen/anzeneisei06/index.html" },
+        { title: "【活用】生産性向上ガイドライン・課題把握ツール (Portal)", url: "https://介護生産性向上.mhlw.go.jp/" }
     ];
 
     notificationList.innerHTML = '<li>読み込み中...</li>';
@@ -144,14 +119,12 @@ async function fetchLatestNotifications() {
         if (data.status === 'ok' && data.items.length > 0) {
             notificationList.innerHTML = '';
             
-            // Priority pinpoint links
             defaultLinks.forEach(link => {
                 const li = document.createElement('li');
                 li.innerHTML = `<a href="${link.url}" target="_blank" style="font-weight:bold; color:var(--sb-green);">📍 ${link.title}</a>`;
                 notificationList.appendChild(li);
             });
 
-            // RSS items (Latest news)
             data.items.slice(0, 3).forEach(item => {
                 const li = document.createElement('li');
                 const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
