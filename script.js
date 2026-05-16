@@ -147,10 +147,18 @@ function renderNews(data) {
     });
 }
 
-// Function to fetch latest MHLW Notifications
+// Function to fetch latest MHLW Notifications with Direct Links
 async function fetchLatestNotifications() {
     if (!notificationList) return;
     
+    // Default important direct links (as a baseline or fallback)
+    const defaultLinks = [
+        { title: "【2026/06】介護報酬臨時改定：処遇改善等に関する告示", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" },
+        { title: "【重要】ケアマネ資格更新制度の廃止・研修見直し法案資料", url: "https://www.mhlw.go.jp/stf/topics/bukyoku/soumu/houritu/221.html" },
+        { title: "【通知】熱中症対策のための高齢者への見守り・声かけについて", url: "https://www.mhlw.go.jp/content/10900000/001247072.pdf" },
+        { title: "【公式】介護分野における生産性向上ポータルサイト", url: "https://介護生産性向上.mhlw.go.jp/" }
+    ];
+
     notificationList.innerHTML = '<li>読み込み中...</li>';
     
     try {
@@ -160,10 +168,19 @@ async function fetchLatestNotifications() {
         
         if (data.status === 'ok' && data.items.length > 0) {
             notificationList.innerHTML = '';
-            data.items.slice(0, 5).forEach(item => {
+            
+            // First, append the priority important links
+            defaultLinks.forEach(link => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="${link.url}" target="_blank" style="font-weight:bold; color:var(--sb-green);">${link.title}</a>`;
+                notificationList.appendChild(li);
+            });
+
+            // Then append top 3 latest from RSS
+            data.items.slice(0, 3).forEach(item => {
                 const li = document.createElement('li');
                 const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
-                li.innerHTML = `<a href="${item.link}" target="_blank">【${date}】${item.title}</a>`;
+                li.innerHTML = `<a href="${item.link}" target="_blank">【最新:${date}】${item.title}</a>`;
                 notificationList.appendChild(li);
             });
         } else {
@@ -171,12 +188,12 @@ async function fetchLatestNotifications() {
         }
     } catch (error) {
         console.error('RSS Fetch Error:', error);
-        notificationList.innerHTML = `
-            <li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" target="_blank">【最新】介護報酬改定・告示情報</a></li>
-            <li><a href="https://www.mhlw.go.jp/stf/topics/bukyoku/soumu/houritu/221.html" target="_blank">ケアマネ資格制度の改正について</a></li>
-            <li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/anzen/anzeneisei04/index.html" target="_blank">職場における熱中症予防対策</a></li>
-            <li><a href="https://www.mhlw.go.jp/topics/kaigo/osirase/jigyou/190401/index.html" target="_blank">生産性向上ガイドライン（居宅）</a></li>
-        `;
+        notificationList.innerHTML = '';
+        defaultLinks.forEach(link => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="${link.url}" target="_blank">${link.title}</a>`;
+            notificationList.appendChild(li);
+        });
     }
 }
 
@@ -194,10 +211,8 @@ function closeModal() {
     document.body.style.overflow = "auto";
 }
 
-// Search & Filter Logic - Robust matching
+// Search & Filter Logic
 function handleSearch(query = null) {
-    // If query is provided, use it. Otherwise, use the search input value.
-    // In both cases, strip '#' and spaces to ensure better matching.
     let rawQ = query !== null ? query : (searchInput ? searchInput.value : "");
     const q = rawQ.replace(/#/g, '').trim().toLowerCase();
     
@@ -208,11 +223,10 @@ function handleSearch(query = null) {
     
     renderNews(filtered);
     
-    // Smooth scroll to news area if filtering
     if (q !== "") {
         const target = document.getElementById('news');
         if (target) {
-            const offset = 80; // Account for sticky header
+            const offset = 80;
             const bodyRect = document.body.getBoundingClientRect().top;
             const elementRect = target.getBoundingClientRect().top;
             const elementPosition = elementRect - bodyRect;
@@ -245,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     renderNews(knowledgeData);
     fetchLatestNotifications();
 
-    // Event Delegation for Sidebar Tags (More robust)
+    // Event Delegation for Sidebar Tags
     document.addEventListener('click', (e) => {
         if (e.target.classList.contains('category-tag')) {
             const tagName = e.target.textContent;
