@@ -196,7 +196,7 @@ function closeModal() {
 
 // Search & Filter Logic
 function handleSearch(query = null) {
-    const q = query !== null ? query.toLowerCase() : searchInput.value.toLowerCase();
+    const q = query !== null ? query.replace('#', '').toLowerCase() : searchInput.value.toLowerCase();
     const filtered = knowledgeData.filter(item => 
         item.title.toLowerCase().includes(q) || 
         item.description.toLowerCase().includes(q) ||
@@ -225,10 +225,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const navNews = document.getElementById('navNews');
     const navSkills = document.getElementById('navSkills');
     const refreshNewsBtn = document.getElementById('refreshNews');
+    const categoryTags = document.querySelectorAll('.category-tag');
 
     // Initial renders
     renderNews(knowledgeData);
     fetchLatestNotifications();
+
+    // Category Tags Logic
+    categoryTags.forEach(tag => {
+        tag.addEventListener('click', () => {
+            const tagName = tag.textContent;
+            if (searchInput) searchInput.value = tagName;
+            handleSearch(tagName);
+        });
+    });
 
     // Event Listeners
     if (logoLink) {
