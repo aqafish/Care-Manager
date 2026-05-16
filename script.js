@@ -76,31 +76,6 @@ const knowledgeData = [
                 <p>ただし、情報セキュリティの確保や、利用者様本人の同意が必須条件となります。適切なツール選びと運用のポイントを解説します。</p>
             </div>
         `
-    },
-    {
-        id: 4,
-        title: "物価高騰に伴う食費基準額の引き上げ",
-        date: "2026/04/15",
-        category: "制度変更",
-        description: "施設系サービスの食費基準額が改定されます。利用者様への説明資料や契約変更のポイントを整理しました。",
-        image: "assets/hero.png",
-        tag: "通知",
-        fullText: `
-            <div class="modal-header">
-                <span class="card-tag">通知</span>
-                <h1>物価高騰に伴う食費基準額の引き上げ</h1>
-                <p class="card-date">公開日: 2026/04/15</p>
-            </div>
-            <div class="modal-body">
-                <p>近年の物価高騰を受け、介護保険施設等における食費の「基準費用額」が、2026年8月1日から引き上げられます。</p>
-                <h2>改定内容</h2>
-                <p>一日あたりの基準費用額が現行から数十円程度アップします。これに伴い、補足給付（負担限度額認定）を受けている方の自己負担額も変更になる場合があります。</p>
-                <ul>
-                    <li><strong>利用者様への説明:</strong> 制度の趣旨（物価高騰への対応）を丁寧に説明するためのチラシ案を用意しました。</li>
-                    <li><strong>契約変更の事務:</strong> 重要事項説明書の差し替えや、同意書の取り付け時期についてのスケジュールを確認しましょう。</li>
-                </ul>
-            </div>
-        `
     }
 ];
 
@@ -147,16 +122,16 @@ function renderNews(data) {
     });
 }
 
-// Function to fetch latest MHLW Notifications with Direct Links
+// Function to fetch latest MHLW Notifications with PINPOINT stable links
 async function fetchLatestNotifications() {
     if (!notificationList) return;
     
-    // Default important direct links (as a baseline or fallback)
+    // Updated stable and verified pinpoint URLs as of May 2026
     const defaultLinks = [
-        { title: "【2026/06】介護報酬臨時改定：処遇改善等に関する告示", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" },
-        { title: "【重要】ケアマネ資格更新制度の廃止・研修見直し法案資料", url: "https://www.mhlw.go.jp/stf/topics/bukyoku/soumu/houritu/221.html" },
-        { title: "【通知】熱中症対策のための高齢者への見守り・声かけについて", url: "https://www.mhlw.go.jp/content/10900000/001247072.pdf" },
-        { title: "【公式】介護分野における生産性向上ポータルサイト", url: "https://介護生産性向上.mhlw.go.jp/" }
+        { title: "【最新:Vol.1502】介護報酬改定 Q&A・留意事項通知（厚生労働省）", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" },
+        { title: "【重要】ケアマネ資格更新制度の廃止スケジュール・検討会資料", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index.html" },
+        { title: "【通知】熱中症予防対策の義務化（令和7年度改定）特設ページ", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/anzen/anzeneisei06/index.html" },
+        { title: "【公式】介護分野における生産性向上ポータル（ガイドライン・ツール）", url: "https://介護生産性向上.mhlw.go.jp/" }
     ];
 
     notificationList.innerHTML = '<li>読み込み中...</li>';
@@ -169,18 +144,18 @@ async function fetchLatestNotifications() {
         if (data.status === 'ok' && data.items.length > 0) {
             notificationList.innerHTML = '';
             
-            // First, append the priority important links
+            // Priority pinpoint links
             defaultLinks.forEach(link => {
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="${link.url}" target="_blank" style="font-weight:bold; color:var(--sb-green);">${link.title}</a>`;
+                li.innerHTML = `<a href="${link.url}" target="_blank" style="font-weight:bold; color:var(--sb-green);">📍 ${link.title}</a>`;
                 notificationList.appendChild(li);
             });
 
-            // Then append top 3 latest from RSS
+            // RSS items (Latest news)
             data.items.slice(0, 3).forEach(item => {
                 const li = document.createElement('li');
                 const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
-                li.innerHTML = `<a href="${item.link}" target="_blank">【最新:${date}】${item.title}</a>`;
+                li.innerHTML = `<a href="${item.link}" target="_blank">【${date}】${item.title}</a>`;
                 notificationList.appendChild(li);
             });
         } else {
@@ -191,7 +166,7 @@ async function fetchLatestNotifications() {
         notificationList.innerHTML = '';
         defaultLinks.forEach(link => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="${link.url}" target="_blank">${link.title}</a>`;
+            li.innerHTML = `<a href="${link.url}" target="_blank">📍 ${link.title}</a>`;
             notificationList.appendChild(li);
         });
     }
