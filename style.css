@@ -57,6 +57,7 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    transition: var(--transition);
 }
 
 nav {
@@ -315,7 +316,25 @@ footer {
     font-size: 0.85rem;
 }
 
-/* Animations */
+/* Buttons & Animations */
+.btn-outline {
+    border: 1px solid var(--sb-green);
+    color: var(--sb-green);
+    padding: 8px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: var(--transition);
+    background: transparent;
+    cursor: pointer;
+}
+
+.btn-outline:hover {
+    background: var(--sb-green);
+    color: white;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -331,18 +350,100 @@ footer {
     animation: fadeInUp 0.8s ease forwards;
 }
 
-.btn-outline {
-    border: 1px solid var(--sb-green);
-    color: var(--sb-green);
-    padding: 8px 20px;
-    border-radius: 20px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    transition: var(--transition);
+/* Mobile Responsiveness & Enhanced UI */
+
+@media (max-width: 1200px) {
+    .container {
+        padding: 0 20px;
+    }
 }
 
-.btn-outline:hover {
-    background: var(--sb-green);
-    color: white;
+@media (max-width: 992px) {
+    .knowledge-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .hero h1 {
+        font-size: 2.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero {
+        padding: 60px 0;
+        border-bottom-left-radius: 40px;
+        border-bottom-right-radius: 40px;
+    }
+    
+    .hero h1 {
+        font-size: 2.2rem;
+    }
+    
+    .hero p {
+        font-size: 1rem;
+        padding: 0 10px;
+    }
+    
+    .search-box {
+        flex-direction: column;
+        background: transparent;
+        box-shadow: none;
+        gap: 12px;
+    }
+    
+    .search-box input {
+        width: 100%;
+        box-shadow: var(--shadow-md);
+        padding: 16px 24px;
+    }
+    
+    .search-box button {
+        width: 100%;
+        padding: 16px;
+    }
+    
+    .section-title h2 {
+        font-size: 1.8rem;
+    }
+    
+    .grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .footer-links {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+
+/* Fix for overlapping header on mobile scroll */
+@media (max-width: 480px) {
+    .logo span {
+        font-size: 1.2rem;
+    }
+    
+    .logo-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .sidebar-box {
+        padding: 20px;
+    }
+}
+
+/* Animations and Premium Touches */
+.card, .sidebar-box, .hero-content {
+    will-change: transform, opacity;
+}
+
+/* Sticky Header adjustment for mobile */
+header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
 }
