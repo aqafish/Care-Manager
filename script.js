@@ -301,9 +301,39 @@ function renderPartnerNews(sourceId) {
 async function fetchPartnerNews() {
     if (!partnerNewsList) return;
     
-    // In a real scenario, this would call a server-side scraper or a CORS-proxy
-    // Since direct scraping is blocked by CORS, we use our updated data store
-    renderPartnerNews('cm-online');
+    partnerNewsList.innerHTML = '<li>読み込み中...</li>';
+
+    try {
+        const fetchNews = async (query) => {
+            const url = `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja`;
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.status === 'ok') {
+                return data.items.slice(0, 5).map(item => {
+                    const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
+                    return { title: item.title.split(' - ')[0], url: item.link, date: date };
+                });
+            }
+            return [];
+        };
+
+        const [cmNews, kaigoNews] = await Promise.all([
+            fetchNews('ケアマネージャー OR ケアマネ'),
+            fetchNews('介護保険 OR 介護報酬')
+        ]);
+
+        partnerNewsData['cm-online'] = cmNews.length > 0 ? cmNews : partnerNewsData['cm-online'];
+        partnerNewsData['cm-dot-com'] = kaigoNews.length > 0 ? kaigoNews : partnerNewsData['cm-dot-com'];
+
+        // Get currently active tab
+        const activeTab = document.querySelector('.tab-btn.active');
+        const target = activeTab ? activeTab.dataset.target : 'cm-online';
+        renderPartnerNews(target);
+
+    } catch (error) {
+        console.error('Partner News Fetch Error:', error);
+        renderPartnerNews('cm-online');
+    }
 }
 
 // Modal Functions
