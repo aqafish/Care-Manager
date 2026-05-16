@@ -76,6 +76,31 @@ const knowledgeData = [
                 <p>ただし、情報セキュリティの確保や、利用者様本人の同意が必須条件となります。適切なツール選びと運用のポイントを解説します。</p>
             </div>
         `
+    },
+    {
+        id: 4,
+        title: "物価高騰に伴う食費基準額の引き上げ",
+        date: "2026/04/15",
+        category: "制度変更",
+        description: "施設系サービスの食費基準額が改定されます。利用者様への説明資料や契約変更のポイントを整理しました。",
+        image: "assets/hero.png",
+        tag: "通知",
+        fullText: `
+            <div class="modal-header">
+                <span class="card-tag">通知</span>
+                <h1>物価高騰に伴う食費基準額の引き上げ</h1>
+                <p class="card-date">公開日: 2026/04/15</p>
+            </div>
+            <div class="modal-body">
+                <p>近年の物価高騰を受け、介護保険施設等における食費の「基準費用額」が、2026年8月1日から引き上げられます。</p>
+                <h2>改定内容</h2>
+                <p>一日あたりの基準費用額が現行から数十円程度アップします。これに伴い、補足給付（負担限度額認定）を受けている方の自己負担額も変更になる場合があります。</p>
+                <ul>
+                    <li><strong>利用者様への説明:</strong> 制度の趣旨（物価高騰への対応）を丁寧に説明するためのチラシ案を用意しました。</li>
+                    <li><strong>契約変更の事務:</strong> 重要事項説明書の差し替えや、同意書の取り付け時期についてのスケジュールを確認しましょう。</li>
+                </ul>
+            </div>
+        `
     }
 ];
 
@@ -122,22 +147,19 @@ function renderNews(data) {
     });
 }
 
-// Function to fetch latest MHLW Notifications (Simulated with Real Data fallback)
+// Function to fetch latest MHLW Notifications
 async function fetchLatestNotifications() {
     if (!notificationList) return;
     
     notificationList.innerHTML = '<li>読み込み中...</li>';
     
     try {
-        // Using a public RSS to JSON API to fetch MHLW news
-        // Note: In a real app, you might use a dedicated backend to avoid CORS issues.
         const rssUrl = encodeURIComponent('https://www.mhlw.go.jp/stf/news.xml');
         const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
         const data = await response.json();
         
         if (data.status === 'ok' && data.items.length > 0) {
             notificationList.innerHTML = '';
-            // Get top 5 latest items
             data.items.slice(0, 5).forEach(item => {
                 const li = document.createElement('li');
                 const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
@@ -149,7 +171,6 @@ async function fetchLatestNotifications() {
         }
     } catch (error) {
         console.error('RSS Fetch Error:', error);
-        // Fallback to static important links if fetch fails
         notificationList.innerHTML = `
             <li><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" target="_blank">【最新】介護報酬改定・告示情報</a></li>
             <li><a href="https://www.mhlw.go.jp/stf/topics/bukyoku/soumu/houritu/221.html" target="_blank">ケアマネ資格制度の改正について</a></li>
@@ -173,7 +194,7 @@ function closeModal() {
     document.body.style.overflow = "auto";
 }
 
-// Search Logic
+// Search & Filter Logic
 function handleSearch(query = null) {
     const q = query !== null ? query.toLowerCase() : searchInput.value.toLowerCase();
     const filtered = knowledgeData.filter(item => 
@@ -201,21 +222,15 @@ document.addEventListener('DOMContentLoaded', () => {
     closeButton = document.querySelector('.close-button');
     notificationList = document.querySelector('.news-list');
     const logoLink = document.getElementById('logoLink');
+    const navNews = document.getElementById('navNews');
     const navSkills = document.getElementById('navSkills');
     const refreshNewsBtn = document.getElementById('refreshNews');
 
     // Initial renders
     renderNews(knowledgeData);
-    fetchLatestNotifications(); // Fetch real-time news
+    fetchLatestNotifications();
 
-    // Refresh Button Click
-    if (refreshNewsBtn) {
-        refreshNewsBtn.addEventListener('click', () => {
-            fetchLatestNotifications();
-        });
-    }
-
-    // Logo Click Reset
+    // Event Listeners
     if (logoLink) {
         logoLink.addEventListener('click', (e) => {
             e.preventDefault();
@@ -224,10 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
-
-    // Nav Links
-    const navNews = document.getElementById('navNews');
-    const navSkills = document.getElementById('navSkills');
 
     if (navNews) {
         navNews.addEventListener('click', (e) => {
@@ -244,7 +255,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Search Box
+    if (refreshNewsBtn) {
+        refreshNewsBtn.addEventListener('click', () => {
+            fetchLatestNotifications();
+        });
+    }
+
     if (searchButton) {
         searchButton.addEventListener('click', () => handleSearch());
     }
