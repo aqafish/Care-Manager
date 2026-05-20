@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>太田の介護 | ケアマネ・ナレッジハブ</title>
     <meta name="description" content="ケアマネジャーのための最新情報・研鑽プラットフォーム。法改正、報酬改定、スキルアップ情報を集約。">
+    <meta name="theme-color" content="#006241">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
@@ -19,9 +22,9 @@
                     <span>太田の介護 <small style="font-size: 0.6rem; opacity: 0.8;">Knowledge Hub</small></span>
                 </a>
                 <div class="nav-links">
-                    <a href="#news" id="navNews" style="text-decoration: none; color: var(--sb-green); font-weight: 600; margin-left: 20px;">最新ニュース</a>
-                    <a href="#skills" id="navSkills" style="text-decoration: none; color: var(--sb-green); font-weight: 600; margin-left: 20px;">スキルアップ</a>
-                    <a href="ai-careplan/index.html" style="text-decoration: none; color: var(--sb-green); font-weight: 600; margin-left: 20px;">🤖 AIケアプラン生成</a>
+                    <a href="#news" id="navNews">最新ニュース</a>
+                    <a href="#skills" id="navSkills">スキルアップ</a>
+                    <a href="ai-careplan/index.html">🤖 AIケアプラン生成</a>
                 </div>
             </nav>
         </div>
@@ -95,10 +98,10 @@
             </aside>
         </div>
 
-        <div class="info-section" style="margin-top: 100px; background: var(--sb-green); color: white; padding: 60px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); text-align: center;">
-            <h2 style="margin-bottom: 24px;">学びを止めるな。</h2>
-            <p style="margin-bottom: 32px; opacity: 0.9;">最新情報をメールで受け取り、常にアップデートされた専門家であり続けましょう。</p>
-            <a href="#" class="btn-outline" style="padding: 16px 40px; font-size: 1.1rem; display: inline-block; background: white; border-color: white;">無料メルマガに登録</a>
+        <div class="info-section">
+            <h2>学びを止めるな。</h2>
+            <p>最新情報をメールで受け取り、常にアップデートされた専門家であり続けましょう。</p>
+            <a href="#" class="btn-outline">無料メルマガに登録</a>
         </div>
     </main>
 
@@ -186,5 +189,20 @@
             margin-bottom: 8px;
         }
     </style>
+    <!-- Bottom Navigation for Mobile App-like Experience -->
+    <nav class="bottom-nav">
+        <a href="#news" class="bottom-nav-item active">
+            <span class="bottom-nav-icon">📰</span>
+            <span class="bottom-nav-text">ニュース</span>
+        </a>
+        <a href="#skills" class="bottom-nav-item">
+            <span class="bottom-nav-icon">📚</span>
+            <span class="bottom-nav-text">スキルアップ</span>
+        </a>
+        <a href="ai-careplan/index.html" class="bottom-nav-item">
+            <span class="bottom-nav-icon">🤖</span>
+            <span class="bottom-nav-text">AIケア</span>
+        </a>
+    </nav>
 </body>
 </html>
