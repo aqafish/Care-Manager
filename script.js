@@ -73,6 +73,8 @@ const partnerNewsData = {
 // Keywords to filter Care Manager specific news
 const cmKeywords = ["ケアマネ", "介護支援専門員", "居宅介護支援", "ケアプラン", "介護報酬", "処遇改善", "資格更新", "法定研修"];
 
+let allNewsData = [...knowledgeData]; // 全てのナレッジデータを保持するグローバル変数
+
 // Function to fetch real-time news from WAM NET and merge with knowledgeData
 async function fetchRealTimeFeaturedTopics() {
     if (!newsGrid) return;
@@ -120,70 +122,21 @@ async function fetchRealTimeFeaturedTopics() {
             });
 
             // Combine static knowledge with real-time news
-            const combinedData = [...realTimeItems, ...knowledgeData];
-            renderNews(combinedData);
+            allNewsData = [...realTimeItems, ...knowledgeData];
+            renderNews(allNewsData);
         } else {
-            renderNews(knowledgeData);
+            allNewsData = [...knowledgeData];
+            renderNews(allNewsData);
         }
     } catch (error) {
         console.error('Real-time Fetch Error:', error);
-        renderNews(knowledgeData);
+        allNewsData = [...knowledgeData];
+        renderNews(allNewsData);
     }
-}
-
-// Function to render news cards
-function renderNews(data) {
-    if (!newsGrid) return;
-    newsGrid.innerHTML = '';
-    
-    if (data.length === 0) {
-        newsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; font-size: 1.2rem; color: var(--sb-text-muted);">該当するナレッジが見つかりませんでした。</p>';
-        return;
-    }
-
-    data.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card animate-fade-in';
-        card.innerHTML = `
-            <div class="card-img" style="background-image: url('${item.image}')"></div>
-            <div class="card-body">
-                <span class="card-date">${item.date}</span>
-                <span class="card-tag">${item.tag}</span>
-                <h3>${item.title}</h3>
-                <p>${item.description}</p>
-                <div class="card-footer">
-                    <button class="btn-outline read-more" data-id="${item.id}">全文を読む</button>
-                </div>
-            </div>
-        `;
-        newsGrid.appendChild(card);
-    });
-
-    // Add event listeners to buttons
-    document.querySelectorAll('.read-more').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const id = btn.getAttribute('data-id');
-            // Check both real-time items and static knowledge
-            let article;
-            if (id.toString().startsWith('rt-')) {
-                // This is a bit inefficient but works for demonstration
-                // In a real app, we'd keep the combined list in a variable
-                const allItems = [...document.querySelectorAll('.read-more')].map(b => b.dataset.id);
-                // We'll just fetch it again or store it globally.
-                // For now, let's assume we can find it in the data passed to renderNews
-            }
-            
-            // Re-find the article from the data
-            // To make this work properly, we should store currentData globally
-            const articleToOpen = currentNewsData.find(a => a.id == id);
-            if (articleToOpen) {
-                openModal(articleToOpen.fullText);
-            }
-        });
-    });
 }
 
 let currentNewsData = []; // Global to store current news
+// Function to render news cards
 function renderNews(data) {
     currentNewsData = data;
     if (!newsGrid) return;
@@ -355,7 +308,7 @@ function handleSearch(query = null) {
     let rawQ = query !== null ? query : (searchInput ? searchInput.value : "");
     const q = rawQ.replace(/#/g, '').trim().toLowerCase();
     
-    const filtered = knowledgeData.filter(item => {
+    const filtered = allNewsData.filter(item => {
         const textToSearch = (item.title + item.description + item.category + item.tag).toLowerCase();
         return textToSearch.includes(q);
     });
@@ -472,4 +425,83 @@ document.addEventListener('DOMContentLoaded', () => {
             closeModal();
         }
     });
+
+    // ============================================
+    // BBS (意見交換掲示板) Logic
+    // ============================================
+    const bbsSubmit = document.getElementById('bbsSubmit');
+    const bbsName = document.getElementById('bbsName');
+    const bbsMessage = document.getElementById('bbsMessage');
+    const bbsError = document.getElementById('bbsError');
+    const bbsList = document.getElementById('bbsList');
+
+    // ネガティブワードのリスト
+    const negativeWords = [
+        "馬鹿", "死ね", "最悪", "キモい", "クソ", "ウザい", "カス", "ゴミ", 
+        "バカ", "アホ", "しね", "使えない", "消えろ", "辞めろ", "うざい", "きもい"
+    ];
+
+    // HTMLエスケープ処理（XSS対策）
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, tag => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+        }[tag] || tag));
+    }
+
+    // 掲示板のコメントを読み込んで表示する
+    function loadComments() {
+        if (!bbsList) return;
+        const comments = JSON.parse(localStorage.getItem('cm_knowledge_comments') || '[]');
+        bbsList.innerHTML = '';
+        if (comments.length === 0) {
+            bbsList.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">まだ意見はありません。最初の意見を投稿してみましょう！</p>';
+        } else {
+            comments.forEach(c => {
+                const div = document.createElement('div');
+                div.className = 'bbs-item animate-fade-in';
+                div.innerHTML = `<strong>${escapeHTML(c.name)}</strong> <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">${escapeHTML(c.date)}</span><p>${escapeHTML(c.message)}</p>`;
+                bbsList.appendChild(div);
+            });
+        }
+    }
+
+    // ネガティブワードが含まれているかチェック
+    function containsNegativeWords(text) {
+        return negativeWords.some(word => text.includes(word));
+    }
+
+    // 掲示板初期化・イベント設定
+    if (bbsSubmit) {
+        loadComments();
+        bbsSubmit.addEventListener('click', () => {
+            const name = bbsName.value.trim() || '匿名ケアマネ';
+            const msg = bbsMessage.value.trim();
+            if (!msg) return;
+
+            // ネガティブワードのバリデーション
+            if (containsNegativeWords(msg) || containsNegativeWords(name)) {
+                bbsError.style.display = 'block';
+                bbsMessage.style.borderColor = '#e74c3c';
+                return;
+            }
+
+            // エラーをリセットして投稿
+            bbsError.style.display = 'none';
+            bbsMessage.style.borderColor = '#ccc';
+            const comments = JSON.parse(localStorage.getItem('cm_knowledge_comments') || '[]');
+            const newComment = {
+                name: name,
+                message: msg,
+                date: new Date().toLocaleString('ja-JP')
+            };
+            comments.unshift(newComment); // 最新を一番上に
+            localStorage.setItem('cm_knowledge_comments', JSON.stringify(comments));
+            
+            // 入力欄をクリアして再描画
+            bbsName.value = '';
+            bbsMessage.value = '';
+            loadComments();
+        });
+    }
+
 });

@@ -98,6 +98,20 @@
             </aside>
         </div>
 
+        <div class="bbs-section" id="bbs">
+            <h2>💬 ケアマネ意見交換掲示板</h2>
+            <p style="margin-bottom: 20px; color: var(--sb-text-muted);">日々の業務の悩みや、法改正への意見を自由に書き込んでください。（※皆が気持ちよく使えるよう、ネガティブな言葉は投稿できない仕組みになっています）</p>
+            <div class="bbs-form">
+                <input type="text" id="bbsName" placeholder="お名前（ニックネーム可）" class="bbs-input-name">
+                <textarea id="bbsMessage" placeholder="意見や悩みを書き込む..." class="bbs-input-msg"></textarea>
+                <div id="bbsError" class="bbs-error-msg" style="display:none; color: #e74c3c; font-weight: bold; font-size: 0.9rem;">※不適切な言葉（ネガティブワード）が含まれているため投稿できません。</div>
+                <button id="bbsSubmit" class="btn-outline" style="align-self: flex-start; background: var(--sb-green); color: white;">投稿する</button>
+            </div>
+            <div class="bbs-list" id="bbsList">
+                <!-- Comments injected via JS -->
+            </div>
+        </div>
+
         <div class="info-section">
             <h2>学びを止めるな。</h2>
             <p>最新情報をメールで受け取り、常にアップデートされた専門家であり続けましょう。</p>
@@ -187,6 +201,64 @@
         }
         .modal-body li {
             margin-bottom: 8px;
+        }
+        
+        /* BBS Styles */
+        .bbs-section {
+            background: var(--sb-white, #ffffff);
+            padding: 30px;
+            border-radius: var(--radius-lg, 12px);
+            margin: 40px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .bbs-section h2 {
+            color: var(--sb-green, #006241);
+            margin-bottom: 10px;
+        }
+        .bbs-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f9fbf9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2ece4;
+        }
+        .bbs-input-name, .bbs-input-msg {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1rem;
+        }
+        .bbs-input-msg {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .bbs-input-name:focus, .bbs-input-msg:focus {
+            outline: none;
+            border-color: var(--sb-green, #006241);
+            box-shadow: 0 0 0 2px rgba(0, 98, 65, 0.2);
+        }
+        .bbs-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .bbs-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            border-left: 4px solid var(--sb-light-green, #b5dfca);
+        }
+        .bbs-item p {
+            margin-top: 8px;
+            color: #333;
+            line-height: 1.5;
+            white-space: pre-wrap;
         }
     </style>
     <!-- Bottom Navigation for Mobile App-like Experience -->
