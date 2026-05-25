@@ -668,15 +668,6 @@ footer {
 
 /* Fix for overlapping header on mobile scroll */
 @media (max-width: 480px) {
-    .logo span {
-        font-size: 1.2rem;
-    }
-    
-    .logo-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
-    }
     
     .card-body {
         padding: 20px;
@@ -713,3 +704,85 @@ header {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* =========================================
+   Law Search & Tabs Styles
+========================================= */
+.search-tab-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: var(--transition);
+    backdrop-filter: blur(5px);
+}
+
+.search-tab-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.search-tab-btn.active {
+    background: var(--sb-white);
+    color: var(--sb-green);
+    border-color: var(--sb-white);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.law-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.law-item {
+    background: var(--sb-white);
+    border-left: 4px solid var(--sb-green);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: var(--transition);
+}
+
+.law-item:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+}
+
+.law-tag {
+    display: inline-block;
+    background: var(--sb-light-green);
+    color: var(--sb-green);
+    font-size: 0.75rem;
+    font-weight: bold;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 8px;
+}
+
+.law-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--sb-text);
+    margin-bottom: 12px;
+}
+
+.law-excerpt {
+    font-size: 0.95rem;
+    color: var(--sb-text-muted);
+    line-height: 1.6;
+    background: #f9fbf9;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid #e2ece4;
+    white-space: pre-wrap;
+}
+
+.law-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+}
+

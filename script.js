@@ -54,8 +54,38 @@ const knowledgeData = [
     }
 ];
 
+// Law & Notification Data Mock
+const lawData = [
+    {
+        id: "law-1",
+        title: "介護保険法 第7条（要介護状態の定義）",
+        category: "介護保険法",
+        tag: "法令",
+        excerpt: "この法律において「要介護状態」とは、身体上又は精神上の障害があるために、入浴、排せつ、食事等の日常生活における基本的な動作の全部又は一部について、厚生労働省令で定める期間にわたり継続して、常時介護を要すると見込まれる状態であって、その状態が軽減し、又は悪化するおそれがないと認められるものをいう。",
+        fullText: "この法律において「要介護状態」とは、身体上又は精神上の障害があるために、入浴、排せつ、食事等の日常生活における基本的な動作の全部又は一部について、厚生労働省令で定める期間にわたり継続して、常時介護を要すると見込まれる状態であって、その状態が軽減し、又は悪化するおそれがないと認められるものをいう。\n\n※ケアマネ実務におけるポイント：要介護認定の根本となる定義です。"
+    },
+    {
+        id: "law-2",
+        title: "居宅介護支援 運営基準 第13条（具体的な取扱方針）",
+        category: "運営基準",
+        tag: "基準",
+        excerpt: "介護支援専門員は、居宅サービス計画の作成に当たっては、利用者の日常生活全般を支援する観点から、介護給付等対象サービス以外の保健医療サービス又は福祉サービス、当該地域の住民による自発的な活動によるサービス等の利用も含めて居宅サービス計画上に位置付けるよう努めなければならない。",
+        fullText: "第十三条の取扱方針\n介護支援専門員は、居宅サービス計画の作成に当たっては、利用者の日常生活全般を支援する観点から、介護給付等対象サービス以外の保健医療サービス又は福祉サービス、当該地域の住民による自発的な活動によるサービス等の利用も含めて居宅サービス計画上に位置付けるよう努めなければならない。\n\n※いわゆる「インフォーマルサービスの活用」についての根拠規定です。"
+    },
+    {
+        id: "law-3",
+        title: "老企第22号通知（モニタリングについて）",
+        category: "厚労省通知",
+        tag: "通知",
+        excerpt: "少なくとも一月に一回、利用者の居宅を訪問し、利用者に面接すること。また、その結果については、少なくとも一月に一回、記録すること。これらを欠いた場合は、運営基準減算の対象となる。",
+        fullText: "居宅介護支援におけるモニタリングに関する解釈通知（老企第22号）\n\n少なくとも一月に一回、利用者の居宅を訪問し、利用者に面接すること。また、その結果については、少なくとも一月に一回、記録すること。これらを欠いた場合は、運営基準減算の対象となる。\n※特例としてテレビ電話等の活用が認められる要件については別途最新の通知を参照すること。"
+    }
+];
+
 // Variables to be initialized on DOMContentLoaded
 let newsGrid, searchInput, searchButton, modal, modalBody, closeButton, notificationList, partnerNewsList;
+let lawGrid, lawContent, mainContent, currentSearchMode = 'knowledge';
+
 
 const partnerNewsData = {
     'cm-online': [
@@ -67,6 +97,13 @@ const partnerNewsData = {
         { title: "多職種連携での「モラハラ」について：ハラスメント対策の新視点", url: "https://i.care-mane.com/times/133837", date: "2026/05/16" },
         { title: "厚労省通知vol.1503：身寄りのない高齢者支援等の調査報告", url: "https://i.care-mane.com/times/133736", date: "2026/05/14" },
         { title: "介護保険の利用者負担引き上げは見送りか？医療費増が優先と予測", url: "https://i.care-mane.com/times/133652", date: "2026/05/11" }
+    ],
+    'joint-kaigo': [
+        { title: "「ケアマネジャーは国家資格」　厚労省・老健局長が国会で改めて明言", url: "https://www.joint-kaigo.com/articles/46211/", date: "2026/05/23" },
+        { title: "介護保険法などの改正案、衆院厚労委で可決　27項目の付帯決議も", url: "https://www.joint-kaigo.com/articles/46203/", date: "2026/05/22" },
+        { title: "ケアマネ協会が財務省に反論　新類型「登録施設介護支援」の報酬、現行評価の維持を主張", url: "https://www.joint-kaigo.com/articles/46179/", date: "2026/05/22" },
+        { title: "介護保険法の改正案は「社会保険の原則破壊」　国会で異論", url: "https://www.joint-kaigo.com/articles/46153/", date: "2026/05/21" },
+        { title: "2040年問題「全国一律ではない」　野口介護保険部会長、地域ごとのサービス基盤整備を促す", url: "https://www.joint-kaigo.com/articles/46131/", date: "2026/05/20" }
     ]
 };
 
@@ -75,45 +112,84 @@ const cmKeywords = ["ケアマネ", "介護支援専門員", "居宅介護支援
 
 let allNewsData = [...knowledgeData]; // 全てのナレッジデータを保持するグローバル変数
 
-// Function to fetch real-time news from WAM NET and merge with knowledgeData
+// Function to fetch real-time news from multiple sources and merge with knowledgeData
 async function fetchRealTimeFeaturedTopics() {
     if (!newsGrid) return;
     
     // Show loading state in the grid
-    newsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>ケアマネ専門情報を同期中...</p></div>';
+    newsGrid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px;"><div class="loading-spinner"></div><p>複数ソースからケアマネ専門情報を同期中...</p></div>';
 
     try {
-        const wamRss = encodeURIComponent('https://www.wam.go.jp/newsPublic/news_new_rss');
-        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${wamRss}`);
-        const data = await response.json();
-        
-        if (data.status === 'ok' && data.items.length > 0) {
-            // Filter items by CM keywords
-            const filteredItems = data.items.filter(item => {
-                const text = (item.title + item.description).toLowerCase();
-                return cmKeywords.some(kw => text.includes(kw));
-            });
+        const timestamp = Date.now();
+        const wamRss = encodeURIComponent(`https://www.wam.go.jp/newsPublic/news_new_rss?t=${timestamp}`);
+        const jointRss = encodeURIComponent(`https://www.joint-kaigo.com/feed/?t=${timestamp}`);
+        const googleRss = encodeURIComponent(`https://news.google.com/rss/search?q=${encodeURIComponent('介護報酬改定 OR ケアプラン OR 居宅介護支援')}&hl=ja&gl=JP&ceid=JP:ja&t=${timestamp}`);
 
-            const realTimeItems = filteredItems.slice(0, 6).map((item, index) => {
-                const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
+        const fetchRss = async (url) => {
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${url}`);
+                const data = await res.json();
+                return data.status === 'ok' ? data.items : [];
+            } catch (e) {
+                return [];
+            }
+        };
+
+        const [wamItems, jointItems, googleItems] = await Promise.all([
+            fetchRss(wamRss),
+            fetchRss(jointRss),
+            fetchRss(googleRss)
+        ]);
+
+        let combinedItems = [];
+        
+        // Process WAM
+        const filteredWam = wamItems.filter(item => cmKeywords.some(kw => (item.title + (item.description||'')).includes(kw))).slice(0, 3).map(item => ({...item, sourceName: "WAM NET"}));
+        combinedItems.push(...filteredWam);
+
+        // Process Joint
+        const filteredJoint = jointItems.filter(item => cmKeywords.some(kw => (item.title + (item.description||'')).includes(kw))).slice(0, 3).map(item => ({...item, sourceName: "介護ニュースJoint"}));
+        combinedItems.push(...filteredJoint);
+
+        // Process Google
+        const filteredGoogle = googleItems.slice(0, 3).map(item => ({...item, sourceName: "Google News", description: item.title + "に関する最新ニュースです。"}));
+        combinedItems.push(...filteredGoogle);
+        
+        if (combinedItems.length > 0) {
+            // Deduplicate by title
+            const uniqueItems = [];
+            const titles = new Set();
+            for (const item of combinedItems) {
+                if (!titles.has(item.title)) {
+                    titles.add(item.title);
+                    uniqueItems.push(item);
+                }
+            }
+
+            // Shuffle or sort by date? Let's just use the mixed order but unique.
+            const realTimeItems = uniqueItems.slice(0, 9).map((item, index) => {
+                const rawDate = item.pubDate || item.published || new Date().toISOString();
+                const date = rawDate.split(' ')[0].replace(/-/g, '/').substring(0, 10);
+                const descText = (item.description || "ケアマネジャー向けの最新ニュースです。").replace(/<[^>]+>/g, '').trim();
+                
                 return {
                     id: `rt-${index}`,
                     title: item.title,
                     date: date,
-                    category: "ケアマネ実務",
-                    description: item.description || "ケアマネジャー向けの最新ニュースです。",
-                    image: "assets/cm1.png", // Fallback image
+                    category: item.sourceName || "ケアマネ実務",
+                    description: descText.substring(0, 60) + (descText.length > 60 ? '...' : ''),
+                    image: index % 2 === 0 ? "assets/cm1.png" : "assets/cm3.png",
                     tag: "リアルタイム",
                     fullText: `
                         <div class="modal-header">
-                            <span class="card-tag">リアルタイム</span>
+                            <span class="card-tag">リアルタイム (${item.sourceName})</span>
                             <h1>${item.title}</h1>
                             <p class="card-date">公開日: ${date}</p>
                         </div>
                         <div class="modal-body">
-                            <p>${item.description || ""}</p>
+                            <p>${descText}</p>
                             <div style="margin-top: 30px; padding: 20px; background: var(--sb-light-green); border-radius: var(--radius-md); text-align: center;">
-                                <p>詳細な情報は公式サイトでご確認いただけます。</p>
+                                <p>詳細な情報は公式サイト（${item.sourceName}）でご確認いただけます。</p>
                                 <a href="${item.link}" target="_blank" class="btn-outline" style="display: inline-block; background: var(--sb-green); color: white; margin-top: 10px;">外部サイトで全文を読む</a>
                             </div>
                         </div>
@@ -192,7 +268,7 @@ async function fetchLatestNotifications() {
     notificationList.innerHTML = '<li>読み込み中...</li>';
     
     try {
-        const rssUrl = encodeURIComponent('https://www.mhlw.go.jp/stf/news.xml');
+        const rssUrl = encodeURIComponent(`https://www.mhlw.go.jp/stf/news.xml?t=${Date.now()}`);
         const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}`);
         const data = await response.json();
         
@@ -250,7 +326,16 @@ function renderPartnerNews(sourceId) {
     });
 }
 
-// Function to simulate fetching partner news
+// Function to update the last updated timestamp for partner news
+function updatePartnerNewsTimestamp() {
+    const el = document.getElementById('partnerNewsLastUpdated');
+    if (!el) return;
+    const now = new Date();
+    const formatted = now.toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    el.textContent = `最終更新: ${formatted}`;
+}
+
+// Function to fetch partner news (industry real-time news)
 async function fetchPartnerNews() {
     if (!partnerNewsList) return;
     
@@ -258,7 +343,7 @@ async function fetchPartnerNews() {
 
     try {
         const fetchNews = async (query) => {
-            const url = `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja`;
+            const url = `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja&t=${Date.now()}`;
             const res = await fetch(url);
             const data = await res.json();
             if (data.status === 'ok') {
@@ -270,22 +355,40 @@ async function fetchPartnerNews() {
             return [];
         };
 
-        const [cmNews, kaigoNews] = await Promise.all([
+        // 介護ニュースJointのRSSフィードを取得
+        const fetchJointNews = async () => {
+            const jointRss = encodeURIComponent(`https://www.joint-kaigo.com/feed/?t=${Date.now()}`);
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${jointRss}&count=8`);
+            const data = await res.json();
+            if (data.status === 'ok' && data.items.length > 0) {
+                return data.items.slice(0, 8).map(item => {
+                    const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
+                    return { title: item.title, url: item.link, date: date };
+                });
+            }
+            return [];
+        };
+
+        const [cmNews, kaigoNews, jointNews] = await Promise.all([
             fetchNews('ケアマネージャー OR ケアマネ'),
-            fetchNews('介護保険 OR 介護報酬')
+            fetchNews('介護保険 OR 介護報酬'),
+            fetchJointNews()
         ]);
 
         partnerNewsData['cm-online'] = cmNews.length > 0 ? cmNews : partnerNewsData['cm-online'];
         partnerNewsData['cm-dot-com'] = kaigoNews.length > 0 ? kaigoNews : partnerNewsData['cm-dot-com'];
+        partnerNewsData['joint-kaigo'] = jointNews.length > 0 ? jointNews : partnerNewsData['joint-kaigo'];
 
         // Get currently active tab
         const activeTab = document.querySelector('.tab-btn.active');
         const target = activeTab ? activeTab.dataset.target : 'cm-online';
         renderPartnerNews(target);
+        updatePartnerNewsTimestamp();
 
     } catch (error) {
         console.error('Partner News Fetch Error:', error);
         renderPartnerNews('cm-online');
+        updatePartnerNewsTimestamp();
     }
 }
 
@@ -308,12 +411,19 @@ function handleSearch(query = null) {
     let rawQ = query !== null ? query : (searchInput ? searchInput.value : "");
     const q = rawQ.replace(/#/g, '').trim().toLowerCase();
     
-    const filtered = allNewsData.filter(item => {
-        const textToSearch = (item.title + item.description + item.category + item.tag).toLowerCase();
-        return textToSearch.includes(q);
-    });
-    
-    renderNews(filtered);
+    if (currentSearchMode === 'knowledge') {
+        const filtered = allNewsData.filter(item => {
+            const textToSearch = (item.title + item.description + item.category + item.tag).toLowerCase();
+            return textToSearch.includes(q);
+        });
+        renderNews(filtered);
+    } else {
+        const filtered = lawData.filter(item => {
+            const textToSearch = (item.title + item.excerpt + item.category + item.tag).toLowerCase();
+            return textToSearch.includes(q);
+        });
+        renderLawData(filtered);
+    }
     
     if (q !== "") {
         const target = document.getElementById('news');
@@ -332,6 +442,49 @@ function handleSearch(query = null) {
     }
 }
 
+function renderLawData(data) {
+    if (!lawGrid) return;
+    lawGrid.innerHTML = '';
+    
+    if (data.length === 0) {
+        lawGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--sb-text-muted);">該当する法令・通知が見つかりませんでした。</p>';
+        return;
+    }
+    
+    data.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'law-item animate-fade-in';
+        el.innerHTML = `
+            <span class="law-tag">${item.category}</span>
+            <div class="law-title">${item.title}</div>
+            <div class="law-excerpt">${item.excerpt}</div>
+            <div class="law-footer">
+                <button class="btn-outline law-read-more" data-id="${item.id}">全文を確認する</button>
+            </div>
+        `;
+        lawGrid.appendChild(el);
+    });
+    
+    document.querySelectorAll('.law-read-more').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            const article = lawData.find(a => a.id === id);
+            if (article) {
+                const modalHtml = `
+                    <div class="modal-header">
+                        <span class="card-tag">${article.category}</span>
+                        <h1>${article.title}</h1>
+                    </div>
+                    <div class="modal-body">
+                        <p style="white-space: pre-wrap; line-height: 1.8;">${article.fullText}</p>
+                    </div>
+                `;
+                openModal(modalHtml);
+            }
+        });
+    });
+}
+
 // Initial Render and Event Listeners
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize elements
@@ -343,16 +496,45 @@ document.addEventListener('DOMContentLoaded', () => {
     closeButton = document.querySelector('.close-button');
     notificationList = document.querySelector('.news-list');
     partnerNewsList = document.getElementById('partnerNewsList');
+    
+    // New variables for law search
+    lawGrid = document.getElementById('lawGrid');
+    lawContent = document.getElementById('lawContent');
+    mainContent = document.getElementById('mainContent');
+    const searchTabBtns = document.querySelectorAll('.search-tab-btn');
+
     const partnerTabs = document.querySelectorAll('.tab-btn');
     const logoLink = document.getElementById('logoLink');
     const navNews = document.getElementById('navNews');
     const navSkills = document.getElementById('navSkills');
     const refreshNewsBtn = document.getElementById('refreshNews');
+    const refreshPartnerNewsBtn = document.getElementById('refreshPartnerNews');
+    const refreshPartnerNewsIcon = document.getElementById('refreshPartnerNewsIcon');
 
     // Initial renders
     fetchRealTimeFeaturedTopics();
     fetchLatestNotifications();
     fetchPartnerNews();
+    renderLawData(lawData); // Initial render for law data
+
+    // Search Tabs Logic
+    searchTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            searchTabBtns.forEach(t => t.classList.remove('active'));
+            btn.classList.add('active');
+            currentSearchMode = btn.dataset.mode;
+            
+            if (currentSearchMode === 'knowledge') {
+                mainContent.style.display = 'block';
+                lawContent.style.display = 'none';
+                searchInput.placeholder = "制度、加算、事例について検索...";
+            } else {
+                mainContent.style.display = 'none';
+                lawContent.style.display = 'block';
+                searchInput.placeholder = "例: モニタリング、要介護認定、減算 ...";
+            }
+        });
+    });
 
     // Partner Tabs logic
     partnerTabs.forEach(tab => {
@@ -398,11 +580,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Refresh News
+    // Refresh Notifications + Featured News
     if (refreshNewsBtn) {
         refreshNewsBtn.addEventListener('click', () => {
             fetchLatestNotifications();
             fetchRealTimeFeaturedTopics();
+        });
+    }
+
+    // Refresh Partner (Industry Real-time) News
+    if (refreshPartnerNewsBtn) {
+        let isRefreshingPartner = false;
+        refreshPartnerNewsBtn.addEventListener('click', async () => {
+            if (isRefreshingPartner) return;
+            isRefreshingPartner = true;
+
+            // Spin animation
+            if (refreshPartnerNewsIcon) {
+                refreshPartnerNewsIcon.style.display = 'inline-block';
+                refreshPartnerNewsIcon.style.animation = 'spin 1s linear infinite';
+            }
+            refreshPartnerNewsBtn.style.opacity = '0.65';
+            refreshPartnerNewsBtn.style.pointerEvents = 'none';
+
+            await fetchPartnerNews();
+
+            // Stop animation
+            if (refreshPartnerNewsIcon) {
+                refreshPartnerNewsIcon.style.animation = '';
+            }
+            refreshPartnerNewsBtn.style.opacity = '1';
+            refreshPartnerNewsBtn.style.pointerEvents = 'auto';
+            isRefreshingPartner = false;
         });
     }
 
