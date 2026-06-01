@@ -79,6 +79,46 @@ const lawData = [
         tag: "通知",
         excerpt: "少なくとも一月に一回、利用者の居宅を訪問し、利用者に面接すること。また、その結果については、少なくとも一月に一回、記録すること。これらを欠いた場合は、運営基準減算の対象となる。",
         fullText: "居宅介護支援におけるモニタリングに関する解釈通知（老企第22号）\n\n少なくとも一月に一回、利用者の居宅を訪問し、利用者に面接すること。また、その結果については、少なくとも一月に一回、記録すること。これらを欠いた場合は、運営基準減算の対象となる。\n※特例としてテレビ電話等の活用が認められる要件については別途最新の通知を参照すること。"
+    },
+    {
+        id: "law-4",
+        title: "介護保険法 第69条の34（秘密保持義務）",
+        category: "介護保険法",
+        tag: "法令",
+        excerpt: "介護支援専門員は、正当な理由なしに、その業務に関して知り得た人の秘密を漏らしてはならない。介護支援専門員でなくなった後においても、同様とする。",
+        fullText: "介護支援専門員は、正当な理由なしに、その業務に関して知り得た人の秘密を漏らしてはならない。介護支援専門員でなくなった後においても、同様とする。\n\n※ケアマネ実務におけるポイント：退職後も続く重い守秘義務が課されています。サービス担当者会議等での情報共有には事前の同意（書面）が必須です。"
+    },
+    {
+        id: "law-5",
+        title: "高齢者虐待防止法 第7条（早期発見と通報義務）",
+        category: "他法令",
+        tag: "法令",
+        excerpt: "養護者による高齢者虐待を受けたと思われる高齢者を発見した者は、速やかに、これを市町村に通報しなければならない。",
+        fullText: "養護者による高齢者虐待を受けたと思われる高齢者を発見した者は、速やかに、これを市町村に通報しなければならない。\n（生命又は身体に重大な危険が生じている場合は通報義務、それ以外は努力義務とされていたが、ケアマネ等の専門職には原則として強い通報義務が期待される。）\n\n※ケアマネ実務におけるポイント：虐待の「疑い」の段階であっても、まずは地域包括支援センターや市町村へ相談・通報することが求められます。これは守秘義務違反には当たりません。"
+    },
+    {
+        id: "law-6",
+        title: "老企第36号（課題分析・アセスメント標準項目）",
+        category: "厚労省通知",
+        tag: "通知",
+        excerpt: "課題分析（アセスメント）に当たっては、国が示す「課題分析標準項目」（基本情報9項目、課題分析14項目）を満たす手法を用いること。",
+        fullText: "課題分析（アセスメント）に当たっては、国が示す「課題分析標準項目」（基本情報9項目、課題分析14項目）を満たす手法（MDS-HC、包括的自立支援プログラム、ケアマネジメント実践記録様式など）を用いること。\n\n※ケアマネ実務におけるポイント：独自のアセスメントシートを使用する場合でも、この標準23項目が網羅されている必要があります。"
+    },
+    {
+        id: "law-7",
+        title: "居宅介護支援 運営基準 第15条（サービス担当者会議）",
+        category: "運営基準",
+        tag: "基準",
+        excerpt: "介護支援専門員は、居宅サービス計画の原案を作成したときは、サービス担当者会議の開催により、利用者の状況等に関する情報を担当者と共有するとともに、専門的な見地からの意見を求めるものとする。",
+        fullText: "介護支援専門員は、居宅サービス計画の原案を作成したときは、サービス担当者会議の開催により、利用者の状況等に関する情報を担当者と共有するとともに、専門的な見地からの意見を求めるものとする。\n\n※やむを得ない理由がある場合は、照会により意見を求めることができますが、その理由を支援経過に明確に記載しておく必要があります（運営基準減算の対象となるため）。"
+    },
+    {
+        id: "law-8",
+        title: "特定事業所加算の算定要件（厚労省告示）",
+        category: "加算要件",
+        tag: "告示",
+        excerpt: "専任の主任介護支援専門員を配置していること、24時間連絡体制を確保していること、計画的な研修を実施していることなど、質の高いケアマネジメントを提供する体制を評価する加算。",
+        fullText: "特定事業所加算（Ⅰ～Ⅲ、医療介護連携加算等）の要件概要\n・専任の主任介護支援専門員の配置\n・常勤の専従介護支援専門員の配置割合\n・利用者に関する24時間の連絡体制と相談対応\n・事業所内での定期的な事例検討会や研修の実施\n・地域包括支援センターからの困難事例の積極的な受け入れ\n\n※ケアマネ実務におけるポイント：加算要件を満たさなくなった場合、速やかに届出を行わないと不正請求となるため、日々の人員基準・研修記録の管理が極めて重要です。"
     }
 ];
 
@@ -109,6 +149,17 @@ const partnerNewsData = {
 
 // Keywords to filter Care Manager specific news
 const cmKeywords = ["ケアマネ", "介護支援専門員", "居宅介護支援", "ケアプラン", "介護報酬", "処遇改善", "資格更新", "法定研修"];
+
+// Function to highlight keywords in text
+function highlightKeywords(text, keywords) {
+    if (!text) return text;
+    let highlightedText = text;
+    keywords.forEach(kw => {
+        const regex = new RegExp(`(${kw})`, 'gi');
+        highlightedText = highlightedText.replace(regex, `<span style="background: rgba(0, 98, 65, 0.1); color: var(--sb-green); font-weight: bold; padding: 0 4px; border-radius: 4px;">$1</span>`);
+    });
+    return highlightedText;
+}
 
 let allNewsData = [...knowledgeData]; // 全てのナレッジデータを保持するグローバル変数
 
@@ -226,13 +277,17 @@ function renderNews(data) {
     data.forEach(item => {
         const card = document.createElement('div');
         card.className = 'card animate-fade-in';
+        
+        const highlightedTitle = highlightKeywords(item.title, cmKeywords);
+        const highlightedDesc = highlightKeywords(item.description, cmKeywords);
+        
         card.innerHTML = `
             <div class="card-img" style="background-image: url('${item.image}')"></div>
             <div class="card-body">
                 <span class="card-date">${item.date}</span>
                 <span class="card-tag">${item.tag}</span>
-                <h3>${item.title}</h3>
-                <p>${item.description}</p>
+                <h3>${highlightedTitle}</h3>
+                <p>${highlightedDesc}</p>
                 <div class="card-footer">
                     <button class="btn-outline read-more" data-id="${item.id}">全文を読む</button>
                 </div>
@@ -259,10 +314,10 @@ async function fetchLatestNotifications() {
     
     // Most SOLID and PINPOINT official sources
     const defaultLinks = [
-        { title: "【最新】介護報酬改定 Q&A・留意事項 (Vol.1502)", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html" },
-        { title: "【決定】ケアマネ資格更新制度の廃止：法案概要資料 (PDF)", url: "https://www.mhlw.go.jp/content/001685800.pdf" },
-        { title: "【通知】熱中症予防対策の義務化と発生時の手順 (特設)", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/anzen/anzeneisei06/index.html" },
-        { title: "【活用】生産性向上ガイドライン・課題把握ツール (Portal)", url: "https://介護生産性向上.mhlw.go.jp/" }
+        { title: "【最新】介護報酬改定 Q&A・留意事項 (Vol.1502)", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/hukushi_kaigo/kaigo_koureisha/index_00010.html", source: "厚生労働省" },
+        { title: "【決定】ケアマネ資格更新制度の廃止：法案概要資料 (PDF)", url: "https://www.mhlw.go.jp/content/001685800.pdf", source: "厚生労働省" },
+        { title: "【通知】熱中症予防対策の義務化と発生時の手順 (特設)", url: "https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/roudoukijun/anzen/anzeneisei06/index.html", source: "厚生労働省" },
+        { title: "【活用】生産性向上ガイドライン・課題把握ツール (Portal)", url: "https://介護生産性向上.mhlw.go.jp/", source: "厚生労働省" }
     ];
 
     notificationList.innerHTML = '<li>読み込み中...</li>';
@@ -277,7 +332,8 @@ async function fetchLatestNotifications() {
             
             defaultLinks.forEach(link => {
                 const li = document.createElement('li');
-                li.innerHTML = `<a href="${link.url}" target="_blank" style="font-weight:bold; color:var(--sb-green);">📍 ${link.title}</a>`;
+                const highlightedTitle = highlightKeywords(link.title, cmKeywords);
+                li.innerHTML = `<a href="${link.url}" target="_blank" style="font-weight:bold; color:var(--sb-green);">📍 ${highlightedTitle} <span style="font-size: 0.75rem; color: var(--sb-text-muted); font-weight: normal; margin-left: 5px; background: #eee; padding: 2px 6px; border-radius: 4px;">[取得先: ${link.source}]</span></a>`;
                 notificationList.appendChild(li);
             });
 
@@ -286,7 +342,8 @@ async function fetchLatestNotifications() {
                 if (cmKeywords.some(kw => text.includes(kw))) {
                     const li = document.createElement('li');
                     const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
-                    li.innerHTML = `<a href="${item.link}" target="_blank">【${date}】${item.title}</a>`;
+                    const highlightedTitle = highlightKeywords(item.title, cmKeywords);
+                    li.innerHTML = `<a href="${item.link}" target="_blank">【${date}】${highlightedTitle} <span style="font-size: 0.75rem; color: var(--sb-text-muted); margin-left: 5px; background: #eee; padding: 2px 6px; border-radius: 4px;">[取得先: 厚生労働省 (RSS)]</span></a>`;
                     notificationList.appendChild(li);
                 }
             });
@@ -307,7 +364,8 @@ async function fetchLatestNotifications() {
         notificationList.innerHTML = '';
         defaultLinks.forEach(link => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="${link.url}" target="_blank">📍 ${link.title}</a>`;
+            const highlightedTitle = highlightKeywords(link.title, cmKeywords);
+            li.innerHTML = `<a href="${link.url}" target="_blank">📍 ${highlightedTitle} <span style="font-size: 0.75rem; color: var(--sb-text-muted); font-weight: normal; margin-left: 5px; background: #eee; padding: 2px 6px; border-radius: 4px;">[取得先: ${link.source}]</span></a>`;
             notificationList.appendChild(li);
         });
     }
@@ -321,7 +379,8 @@ function renderPartnerNews(sourceId) {
     
     items.forEach(item => {
         const li = document.createElement('li');
-        li.innerHTML = `<a href="${item.url}" target="_blank">【${item.date}】${item.title}</a>`;
+        const highlightedTitle = highlightKeywords(item.title, cmKeywords);
+        li.innerHTML = `<a href="${item.url}" target="_blank">【${item.date}】${highlightedTitle}</a>`;
         partnerNewsList.appendChild(li);
     });
 }
@@ -343,7 +402,8 @@ async function fetchPartnerNews() {
 
     try {
         const fetchNews = async (query) => {
-            const url = `https://api.rss2json.com/v1/api.json?rss_url=https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja&t=${Date.now()}`;
+            const targetUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ja&gl=JP&ceid=JP:ja&t=${Date.now()}`;
+            const url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(targetUrl)}`;
             const res = await fetch(url);
             const data = await res.json();
             if (data.status === 'ok') {
@@ -358,10 +418,14 @@ async function fetchPartnerNews() {
         // 介護ニュースJointのRSSフィードを取得
         const fetchJointNews = async () => {
             const jointRss = encodeURIComponent(`https://www.joint-kaigo.com/feed/?t=${Date.now()}`);
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${jointRss}&count=8`);
+            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${jointRss}&count=30`);
             const data = await res.json();
             if (data.status === 'ok' && data.items.length > 0) {
-                return data.items.slice(0, 8).map(item => {
+                const filtered = data.items.filter(item => {
+                    const text = (item.title + (item.description || "")).toLowerCase();
+                    return cmKeywords.some(kw => text.includes(kw));
+                });
+                return filtered.slice(0, 5).map(item => {
                     const date = item.pubDate.split(' ')[0].replace(/-/g, '/');
                     return { title: item.title, url: item.link, date: date };
                 });
@@ -370,8 +434,8 @@ async function fetchPartnerNews() {
         };
 
         const [cmNews, kaigoNews, jointNews] = await Promise.all([
-            fetchNews('ケアマネージャー OR ケアマネ'),
-            fetchNews('介護保険 OR 介護報酬'),
+            fetchNews('ケアマネージャー OR ケアマネ OR 介護支援専門員 OR 居宅介護支援'),
+            fetchNews('介護報酬改定 OR 処遇改善 OR (介護保険 ケアマネ)'),
             fetchJointNews()
         ]);
 
