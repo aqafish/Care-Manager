@@ -747,7 +747,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bbsSubmit) {
         loadComments();
         bbsSubmit.addEventListener('click', () => {
-            const name = bbsName.value.trim() || '匿名ケアマネ';
+            const name = bbsName.value.trim() || 'ケアマネ';
             const msg = bbsMessage.value.trim();
             if (!msg) return;
 
